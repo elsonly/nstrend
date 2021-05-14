@@ -22,12 +22,6 @@ code_map_dict = {x:y for (x,y) in zip(stock_df['code'], stock_df['name'].str.rep
 
 app = FastAPI()
 
-class StockTrend(BaseModel):
-    name: str
-    code: str
-    date: List[datetime]
-    trend: List[float]
-
 @app.get("/trend/{code}")
 async def get_stock_trend(
     code: str = Path(..., title="Stock Code", max_length=4, min_length=4),

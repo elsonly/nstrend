@@ -7,7 +7,8 @@ a rate limit. It cannot be solved by using proxies.
 2. Date range only availible near 3 months. 
 Google Trend is not static data, which means data is inconsistent 
 through timeframe and (topic?). Data with different date range from google api 
-is not comparible.
+is not comparible. Note that if data is incosistent through topic, this module
+will become useless(Check).
 3. nstrend data may not be the same as Google Trend.
 Since Google Trend API only allow "5" topics per each request, which means
 we cannot get comparible data in one request. And still, Google Trend API
@@ -19,7 +20,7 @@ dataframe to make it comparible.
 ## How to Use it
 Run api server
 ```bash
-uvicorn main:app --app-dir nstrend --reload
+uvicorn main:app --reload
 ```
 
 ## API Methods

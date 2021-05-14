@@ -30,7 +30,7 @@ handlers:
             class: logging.handlers.RotatingFileHandler
             level: INFO
             formatter: simple
-            filename: ./nstrend/log/debug.log
+            filename: ./log/debug.log
             maxBytes: 5242880
             backupCount: 1
             encoding: utf8
@@ -39,7 +39,7 @@ handlers:
             class: logging.handlers.RotatingFileHandler
             level: ERROR
             formatter: simple
-            filename: ./nstrend/log/debug.log
+            filename: ./log/debug.log
             maxBytes: 5242880
             backupCount: 1
             encoding: utf8

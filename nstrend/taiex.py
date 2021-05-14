@@ -7,7 +7,7 @@ from logger import Logger
 
 class StockListScaper:
     def __init__(self):
-        self.base_path = './nstrend/data/'
+        self.base_path = './data/'
         logger = Logger()
         self.logger = logger.get_scrape_logger()
 
@@ -19,8 +19,7 @@ class StockListScaper:
             df = self.request_stk_list()
             df.to_csv(filedir, index=False)
 
-        else:
-            return pd.read_csv(filedir)
+        return pd.read_csv(filedir)
 
         
     def request_stk_list(self):

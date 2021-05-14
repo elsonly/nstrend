@@ -11,7 +11,7 @@ class TrendScraper:
     def __init__(self):
         logger = Logger()
         self.logger = logger.get_scrape_logger()
-        self.filedir = './nstrend/data/trend.csv'
+        self.filedir = './data/trend.csv'
         self.check_update()
 
     def scrape_trend_batch(self, stk_list:list, start_date:str, end_date:str):
@@ -87,9 +87,9 @@ class TrendScraper:
             df_stk_list.drop_duplicates(['name'], inplace=True)
 
             stk_list = df_stk_list['name'].tolist()
-
+            
             end_date = datetime.now().strftime('%Y-%m-%d')
-            start_date = (datetime.now() - timedelta(months=3)).strftime('%Y-%m-%d')
+            start_date = (datetime.now() - timedelta(days=90)).strftime('%Y-%m-%d')
             df = self.scrape_trend(stk_list, start_date, end_date)
         
         else:
