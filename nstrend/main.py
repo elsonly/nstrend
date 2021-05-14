@@ -18,7 +18,7 @@ trend_df = ts.get_trend_data()
 # get tw stock list
 sls = StockListScaper()
 stock_df = sls.get_stk_list()
-code_map_dict = {x:y for (x,y) in zip(stock_df['code'], stock_df['name'].str.replace('-KY', ''))}
+code_map_dict = {str(x):str(y) for (x,y) in zip(stock_df['code'], stock_df['name'].str.replace('-KY', ''))}
 
 app = FastAPI()
 
