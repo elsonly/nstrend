@@ -8,7 +8,7 @@ from nstrend.routers import trend
 #Initialize
 ##database
 models.Base.metadata.create_all(bind=engine)
-tc = TrendCrawler(controller='台積電', n_topics=5)
+tc = TrendCrawler(controller='台積電', timeframe_ls=['today 3-m'], stockType=1)
 tc.autocheck()
 
 ##api server

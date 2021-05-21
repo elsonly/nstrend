@@ -12,10 +12,30 @@ from nstrend.crawl.taiex import StockListCrawler
 logger = get_logger('crawler')
 
 class TrendCrawler:
-    def __init__(self, controller:str, n_topics:int=5, proxy_ls:list=[]):
+    def __init__(self, controller:str, n_topics:int=5, timeframe_ls:list=[],
+            stockType:int=1, proxy_ls:list=[]):
+        """
+        parameters
+        ______________
+        @controller:str, Used to be sent to google trend api
+                        as one of topics in each request.
+        @n_topics:int, number of topics in each request, n_topics should be 
+                        beween 2 and 5
+        @timeframe_ls:list, available timeframe: 
+                            'today 1-m', 'today 3-m', 'today 12-m',
+                            'now 1-d', 'now 7-d',
+                            'now 1-H', 'now 4-H'
+        @stockType:int, 1:上市, 2:上櫃, 3:興櫃一般板, 0:上市, 上櫃, 興櫃一般板
+        @proxy_ls:list
+        """
+        if n_topics>5 or n_topics<2:
+            raise ValueError("n_topics should be betweend 2 and 5")
+
         self.controller = controller
         self.n_topics = n_topics
         self.proxy_ls = proxy_ls
+        self.timeframe_ls = timeframe_ls
+        self.stockType = stockType
 
     def _request(self, kw_list:list, timeframe:str='today 3-m') -> pd.DataFrame:
         """
@@ -211,12 +231,13 @@ class TrendCrawler:
         if not trend_data or \
                 (datetime.now().date() - trend_data.up_date).days > 0:
             logger.info("Update Google Trend Data")
-            timeframe_ls = ['today 3-m']
-            for timeframe in timeframe_ls:
-                self.run(stockType=1, timeframe=timeframe)
+            for timeframe in self.timeframe_ls:
+                self.run(stockType=self.stockType, timeframe=timeframe)
 
 if __name__ == '__main__':
-    tc = TrendCrawler(controller='台積電', n_topics=5)
+    timeframe_ls=['today 3-m']
+    tc = TrendCrawler(controller='台積電', n_topics=5, timeframe_ls=timeframe_ls, stockType=1)
     #tc.loadStocks(stockType=1)
-    tc.run(stockType=1, timeframe='today 3-m')
+    for timeframe in timeframe_ls:
+        tc.run(stockType=1, timeframe=timeframe)
     
