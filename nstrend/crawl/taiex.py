@@ -3,26 +3,14 @@ import pandas as pd
 from datetime import datetime
 import os
 
-from logger import Logger
+from nstrend.database import SessionLocal
+from nstrend.models import Stock
+from nstrend.logger import get_logger
+logger = get_logger('crawler')
 
-class StockListScaper:
-    def __init__(self):
-        self.base_path = './data/'
-        logger = Logger()
-        self.logger = logger.get_scrape_logger()
+class StockListCrawler:
 
-    def get_stk_list(self):
-        filename = 'stock_list.csv'
-        filedir = self.base_path + filename
-        if not os.path.exists(filedir) or \
-                (datetime.now() - datetime.fromtimestamp(os.path.getmtime(filedir))).days > 30 :
-            df = self.request_stk_list()
-            df.to_csv(filedir, index=False)
-
-        return pd.read_csv(filedir)
-
-        
-    def request_stk_list(self):
+    def request(self) -> pd.DataFrame:
         df_list = []
         header = {
             'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
@@ -34,7 +22,7 @@ class StockListScaper:
         }
         strMode_mapping = {2:'上市', 4:'上櫃', 5:'興櫃'}
         for strMode in [2, 4, 5]:
-            self.logger.info(f"Request {strMode_mapping[strMode]} stock list")
+            logger.info(f"Request {strMode_mapping[strMode]} stock list")
 
             url = f"https://isin.twse.com.tw/isin/C_public.jsp?strMode={strMode}"
             res = requests.get(url, headers=header)
@@ -47,7 +35,35 @@ class StockListScaper:
             df_list.append(df)                
 
         return pd.concat(df_list).reset_index(drop=True)
+
+    def preprocessing(self, df):
+        #Exclude keywords -KY
+        df['name'] = df['name'].str.replace('-KY', '')
+        df.drop_duplicates(['name'], inplace=True)
+
+    def df2db(self, df:pd.DataFrame, table:str='stock_basic'):
+        s = SessionLocal()
+        if table == 'stock_basic':
+            for _, row in df.iterrows():
+                s.query(Stock).filter(Stock.code==row['code']).delete()
+                data = Stock(code=str(row['code']), 
+                                name=str(row['name']), 
+                                ipo_date=pd.to_datetime(row['ipo_date']),
+                                ipo_type=str(row['type']),
+                                industry=str(row['ind'])
+                                ) 
+                s.add(data)
+            s.commit()
+            s.close()
+        else:
+            raise ValueError("Invalid table")
+        s.close()
+
+    def run(self):
+        df = self.request()
+        self.preprocessing(df)
+        self.df2db(df)
     
 if __name__ == '__main__':
-    sls = StockListScaper()
-    df = sls.get_stk_list()
+    slc = StockListCrawler()
+    slc.run()
