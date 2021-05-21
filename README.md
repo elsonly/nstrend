@@ -1,5 +1,5 @@
 # nstrend(Beta) - Google Trend on Taiwan Stock Market
-nstrend crawls [Google Trend](https://trends.google.com/trends/) data of Taiwan Stock and run server base on fastapi-sqlite.
+nstrend crawls [Google Trend](https://trends.google.com/trends/) data of Taiwan Stock and run server base on fastapi - SQLAlchemy.
 
 
 Note that there serveral limits due to Google Trend constraint.
